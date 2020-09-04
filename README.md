@@ -2,7 +2,7 @@
 
 This repository contains Python 3 dialogue frustration intensity prediction source code.
 
-## Instruction to run the program:
+## Instruction to run the program
     
   - Dialog input file should exist in the current directory named "dprocessed.txt" (example of a file given in the repository)
   - The parameters should be set as global variables:
@@ -12,7 +12,7 @@ This repository contains Python 3 dialogue frustration intensity prediction sour
   -- HIDDEN_COUNT
   -- EPOCHS
   - python3 file to be run without parameters
-  - output is written into "output.txt"
+  - Output is written into "output.txt"
 	
 ## Releated research paper
 
