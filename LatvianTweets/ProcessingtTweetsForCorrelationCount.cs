@@ -12,13 +12,12 @@ namespace LatvianTweets
 	{
 		static void Main(string[] args)
 		{
-			string[] lines0 = System.IO.File.ReadAllLines(@"C:\Users\Lynxa\Desktop\Doctorals\Latvian tweets\tweets_vl.txt");
-			string[] lines1 = System.IO.File.ReadAllLines(@"C:\Users\Lynxa\Desktop\Doctorals\Latvian tweets\tweets_kl.txt");
-			string[] lines2 = System.IO.File.ReadAllLines(@"C:\Users\Lynxa\Desktop\Doctorals\Latvian tweets\tweets_jb2.txt");
-			string[] lines3 = System.IO.File.ReadAllLines(@"C:\Users\Lynxa\Desktop\Doctorals\Latvian tweets\tweets_ss2.txt");
-			StreamWriter allAnnotations = new StreamWriter(@"C:\Users\Lynxa\Desktop\Doctorals\Latvian tweets\all_annotations_counts9.txt");
-			StreamWriter uppercase = new StreamWriter(@"C:\Users\Lynxa\Desktop\Doctorals\Latvian tweets\uppercase.txt");
-
+			string[] lines0 = System.IO.File.ReadAllLines(@"tweets_vl.txt");
+			string[] lines1 = System.IO.File.ReadAllLines(@"tweets_kl.txt");
+			string[] lines2 = System.IO.File.ReadAllLines(@"tweets_jb.txt");
+			string[] lines3 = System.IO.File.ReadAllLines(@"tweets_ss.txt");
+			StreamWriter allAnnotations = new StreamWriter(@"all_annotations_counts.txt");
+			
 			string pattern = @"[A-ZĀĪĒŪŠĶĻŅČĢŽ]{5,}$";
 			string patternA= @"[AaĀā]{3,}";
 			string patternAllEmo = @"([<]).+?([>])";
@@ -175,13 +174,6 @@ namespace LatvianTweets
 					tline = "";
 				}				
 			}
-
-			foreach (var r in result)
-			{
-				uppercase.WriteLine(r.Key + "\t" + r.Value);
-			}
-			uppercase.Flush();
-
 			allAnnotations.Flush();						
 		}		
 	}
