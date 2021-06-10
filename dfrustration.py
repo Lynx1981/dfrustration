@@ -70,6 +70,58 @@ def add_dialogue_info(ddata,dgrades,dialogue,key):
     if len(dialogue2)>0:
         ddata[key] = dialogue2
         dgrades[key] = grades2
+def calculate_metrics(line):
+    metrics = []
+    metrics =[0.0 for i in range(15)] 
+        
+    #message length
+    lng = len(line)
+    metrics[0]=(lng)    
+    #number of exclamation signs
+    numExcl = line.count('!')
+    metrics[1]=(numExcl)    
+      #number of exclamation signs normalized
+    numExclNorm = numExcl / lng
+    metrics[2]=(numExclNorm)    
+     # number of question marks
+    numQue = line.count('?')
+    metrics[3]=(numQue)
+      #number of dots ceiled
+    numDot = line.count('.')
+    numDotC = numDot if numDot<=4 else 4
+    metrics[4]=(numDot)
+          #number of commas
+    numCom = line.count(',')
+    metrics[5]=(numCom)
+    #number of quotes cappedd
+    numQuo = line.count('\'') + line.count('"') + line.count('“') + line.count('”') + line.count('‘')+ line.count('’')
+    metrics[6] = (numQuo) if numQuo<=4 else 4
+     # number of quotes
+    numQuo = line.count('\'') + line.count('"') + line.count('“') + line.count('”') + line.count('‘')+ line.count('’')
+    metrics[14] = numQuo
+    # number of uppercase words
+    numUpp = re.findall(r'[A-ZĀĪĒŪŠĶĻŅŽČĢ]{5,}', line)
+    metrics[7] = (len(numUpp))
+    #number of sequences consisted of repeating letter a
+    numA = re.findall(r'[aA]{3,}', line)
+    metrics[8]=(len(numA))
+    #built-in emojis
+    emojis = re.findall(r'([<]).+?([>])', line)
+    metrics[13]=len(emojis)
+    # positive smileys
+    numHEmoPos = re.findall(r':\)|:-\)|;\);-\)|:P|:D', line)
+    metrics[9]=(len(numHEmoPos))
+    #negative smileys
+    numHEmoNeg = re.findall(r':-\(', line)
+    metrics[10]=(len(numHEmoNeg))
+    #picture in the message
+    pic = 1 if line.find('https://pbs.twimg.com/')>-1 else 0
+    metrics[11]=(pic)
+    #PTAC mention
+    ptac = 1 if line.upper().find('PTACGOVLV')>-1 else 0
+    metrics[12]=(ptac)
+    
+    return metrics
 
 def analyze_annotation_file(fname):
     user_turns = 0
@@ -91,9 +143,9 @@ def analyze_annotation_file(fname):
                 supp_turns += 1
             if key!="": 
                 line = line.replace('&amp;','&')
-                line = line.replace('&gt;','>')
-                line = line.replace('&lt;','<')
-                line = line.replace(';',' .,')
+             #   line = line.replace('&gt;','>')
+             #   line = line.replace('&lt;','<')
+             #   line = line.replace(';',' .,')
                 dialogue.append(line)
         else:
             add_dialogue_info(ddata,dgrades,dialogue,key)
@@ -212,7 +264,12 @@ if __name__ == '__main__':
     grydeltasum = 0
     grydeltacount = 0
     grydeltastats = [0 for _ in range(9)]
-    
+    sourcefilename = "dialogs_annotated_standard_three_usr.txt"
+    #sourcefilename = "segmented_usr.txt"
+    SEGMENTED=True
+    if (sourcefilename == "dialogs_annotated_standard_three_usr.txt"):
+       SEGMENTED=False     
+                    
     # A. read dialogues from file
     ddata,dgrades=analyze_annotation_file("dprocessed.txt")
     print(len(ddata),len(dgrades))
@@ -356,11 +413,19 @@ if __name__ == '__main__':
                     gryprev = gry
                     gry = compute_final_grade_median3(dgrades[key][i])
                     goodwords = set()
-                    curr_hot = [0 for _ in range(USER_KEYWORD_COUNT)]
+                    #### metrics
+                   # curr_hot = [0 for _ in range(BESTCOUNT_FREQ_STD_MEDIAN)]
+                    BESTCOUNT_WITH_METRICS = BESTCOUNT_FREQ_STD_MEDIAN+len(metrics)
+                    curr_hot = [0 for _ in range(BESTCOUNT_WITH_METRICS)]
+                    #### end metrics
                     for word in takelist:
                         if word in usrworddict:
                             goodwords.add(word)
                             curr_hot[usrworddict[word]] = 1
+                    #### metrics
+                    for indm in (range(len(metrics))):
+                        curr_hot[BESTCOUNT_FREQ_STD_MEDIAN+indm] = metrics[indm]
+                    #### end metrics
                     curr_hot_string = [str(i) for i in curr_hot]
                     curr_goodwords = list(goodwords)
                     if gry>=0:
@@ -399,11 +464,19 @@ if __name__ == '__main__':
                     prev_hot_string = curr_hot_string
                 elif line[:5]=="SUPP:":
                     goodwords = set()
-                    curr_hot = [0 for _ in range(SUPPORT_KEYWORD_COUNT)]
+                    #### metrics
+                   # curr_hot = [0 for _ in range(BESTCOUNT_FREQ_STD_MEDIAN)]
+                    BESTCOUNT_WITH_METRICS = BESTCOUNT_FREQ_STD_MEDIAN+len(metrics)
+                    curr_hot = [0 for _ in range(BESTCOUNT_WITH_METRICS)]
+                    #### end metrics
                     for word in takelist:
                         if word in suppworddict:
                             goodwords.add(word)
                             curr_hot[suppworddict[word]] = 1
+                    #### metrics
+                    for indm in (range(len(metrics))):
+                        curr_hot[BESTCOUNT_FREQ_STD_MEDIAN+indm] = metrics[indm]
+                    #### end metrics
                     curr_hot_string = [str(i) for i in curr_hot]
                     supp_goodwords = list(goodwords)
                     supp_take = take
